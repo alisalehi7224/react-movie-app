@@ -38,18 +38,21 @@
   white-space: nowrap;
 }
 
+
 .search-button:hover {
   background-color: #f40612;
 }
 
 
-@media (max-width: 639px) {
+@media (max-width: 395px) {
   .home {
     padding: 1rem 0;
   }
 
   .search-form {
     margin-bottom: 1rem;
+    padding: 0;
+    gap: 0.5rem;
   }
 }
 
@@ -107,3 +110,4 @@
   margin-bottom: 20px;
   font-weight: bold;
 }
+
