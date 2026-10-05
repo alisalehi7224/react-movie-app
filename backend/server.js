@@ -12,6 +12,7 @@ app.get("/", (req, res) => {
 });
 
 
+
 app.get("/api/movies/popular", async (req, res) => {
   try {
     const response = await axios.get(
@@ -46,9 +47,32 @@ app.get("/api/movies/search", async (req, res) => {
     );
 
     res.json(response.data);
-  } catch (error) {
+  }
+   catch (error) {
     console.error("TMDB search failed:", error.message);
     res.status(500).json({ error: "Failed to search movies" });
+  }
+});
+
+
+
+
+app.get("/api/movies/:id", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${req.params.id}`,
+      {
+        params: {
+          api_key: process.env.TMDB_API_KEY,
+        },
+      }
+    );
+
+    res.json(response.data);
+  }
+   catch (error) {
+    console.error("TMDB search failed:", error.message);
+    res.status(500).json({ error: "Failed to load movie details" });
   }
 });
 
