@@ -1,11 +1,19 @@
 import "../css/MovieCard.css"
 import { useMovieContext } from '../contexts/MovieContext.jsx';
+import { useNavigate } from "react-router-dom";
 
 function MovieCard({ movie }) {
     const { addToFavorites, isFavorite, removeFromFavorites } = useMovieContext();
-    const favorite = isFavorite(movie.id);
+    const navigate = useNavigate();
 
+    function handleClick(){
+        navigate(`/MovieDetails/${movie.id}`);
+    }
+
+
+    const favorite = isFavorite(movie.id);
     function onFavoriteClick(e) {
+        e.stopPropagation()
         e.preventDefault();
         if (!favorite) {
             addToFavorites(movie)
@@ -17,7 +25,7 @@ function MovieCard({ movie }) {
         }`
     return (
         <div className="movie-card-wrapper">
-            <div className="movie-card">
+            <div className="movie-card" onClick={handleClick}>
                 <div className="movie-poster">
                     <img src={imageURL} alt={movie.title} />
                     <div className="movie-overlay">

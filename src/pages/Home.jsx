@@ -1,7 +1,7 @@
 import MovieCard from "../components/MovieCard"
 import "../css/Home.css"
 import { useEffect, useState } from "react"
-import { searchMovies, getPopularMovies } from '../services/api.js'
+import { searchMovies, getPopularMovies, getMovieDetails } from '../services/api.js'
 
 function Home() {
 
@@ -24,8 +24,8 @@ function Home() {
                 setLoading(false);
             }
         }
-
         loadPopularMovies()
+        
     }, [])
 
 
@@ -47,10 +47,13 @@ function Home() {
         } finally {
             setLoading(false)
         }
-
+        
         setSearchQuery("");
     }
 
+    
+
+    
     return (<>
         <div className="home">
 
@@ -63,7 +66,8 @@ function Home() {
                 </button>
             </form>
 
-            {error && <div className="error-message">
+            {error && 
+            <div className="error-message">
                 {error}
             </div>}
 
@@ -79,10 +83,9 @@ function Home() {
                         {movies.map(movie =>
                             <MovieCard movie={movie} key={movie.id} />)}
                     </div>}
-
-
         </div>
     </>)
 }
 
 export default Home;
+
