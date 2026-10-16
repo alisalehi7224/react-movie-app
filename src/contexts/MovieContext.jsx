@@ -4,6 +4,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 
 const movieContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useMovieContext = () => useContext(movieContext);
 
 
@@ -26,14 +27,12 @@ export const MovieProvider = ({ children }) => {
     }
 
     const removeFromFavorites = (movieID) => {
-        const newFavs = favorites.filter((movie) => movie.id !== movieID)
-        setFavorites(newFavs);
+        setFavorites(prev => prev.filter((movie) => movie.id !== movieID));
     }
 
     const isFavorite = (movieID) => {
         return favorites.some(movie => movie.id === movieID);
     }
-
 
     const value = {
         favorites,
@@ -42,12 +41,8 @@ export const MovieProvider = ({ children }) => {
         isFavorite
     }
 
-
     return <movieContext.Provider value={value}>
         {children}
     </movieContext.Provider>
 
-
-
 }
-

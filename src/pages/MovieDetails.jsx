@@ -12,11 +12,13 @@ function MovieDetails() {
     const [movie, setMovie] = useState(null);
     
     useEffect(() => {
+        let ignore = false;
         async function loadMovie() {
             const data = await getMovieDetails(ID);
-            setMovie(data);
+            if (!ignore){setMovie(data);}
         }
         loadMovie();
+        return () => {ignore = true};
     }, [ID]);
 
     const { addToFavorites, isFavorite, removeFromFavorites } = useMovieContext();

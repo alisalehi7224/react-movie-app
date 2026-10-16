@@ -1,4 +1,3 @@
-import MovieCard from './components/MovieCard.jsx'
 import Home from './pages/Home.jsx'
 import MovieDetails from './pages/MovieDetails.jsx'
 import Favorite from './pages/Favorites.jsx'
@@ -8,12 +7,6 @@ import { MovieProvider } from './contexts/MovieContext.jsx';
 import './css/App.css'
 
 function App() {
-
-
-
-  const movieNumber = 1;
-
-
 
   return (
 
