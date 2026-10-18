@@ -6,24 +6,33 @@ import {useState, useEffect} from 'react'
 
 
 function MovieDetails() {
-
+    const [error, setError] = useState(null);
 
     const {ID} = useParams()
     const [movie, setMovie] = useState(null);
     
     useEffect(() => {
-        let ignore = false;
+        const controller = new AbortController();
+
         async function loadMovie() {
-            const data = await getMovieDetails(ID);
-            if (!ignore){setMovie(data);}
+            try{
+                setError(null);
+                const data = await getMovieDetails(ID, controller.signal);
+                setMovie(data);
+            }catch(err){
+                if(err.name === "AbortError") return;
+                console.error(err)
+                setError("Failed to load movie details...");
+            }
         }
         loadMovie();
-        return () => {ignore = true};
+        return () => {controller.abort()};
     }, [ID]);
 
     const { addToFavorites, isFavorite, removeFromFavorites } = useMovieContext();
 
-    if (!movie) return <p>Loading...</p>;
+    if (error) return <div className="error-message">{error}</div>;
+    if (!movie) return <div className="error-message">Loading...</div>;
     
     const favorite = isFavorite(movie.id);
     function onFavoriteClick(e) {
