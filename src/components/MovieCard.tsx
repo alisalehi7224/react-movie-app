@@ -1,23 +1,25 @@
-import "../css/MovieCard.css"
-import { useMovieContext } from '../contexts/MovieContext.jsx';
-import {Link} from 'react-router-dom'
+import { MouseEvent } from "react";
+import "../css/MovieCard.css";
+import { useMovieContext, Movie } from '../contexts/MovieContext';
+import { Link } from 'react-router-dom';
 
-function MovieCard({ movie }) {
+function MovieCard({ movie }: { movie: Movie }) {
     const { addToFavorites, isFavorite, removeFromFavorites } = useMovieContext();
 
-
     const favorite = isFavorite(movie.id);
-    function onFavoriteClick(e) {
-        e.stopPropagation()
+    
+    function onFavoriteClick(e: MouseEvent<HTMLButtonElement>) {
+        e.stopPropagation();
         e.preventDefault();
         if (!favorite) {
-            addToFavorites(movie)
+            addToFavorites(movie);
+        } else { 
+            removeFromFavorites(movie.id); 
         }
-        else { removeFromFavorites(movie.id) }
     }
 
-    const imageURL = `https://www.themoviedb.org/t/p/w342/${movie.poster_path
-        }`
+    const imageURL = `https://www.themoviedb.org/t/p/w342/${movie.poster_path}`;
+    
     return (
         <div className="movie-card-wrapper">
             <Link to={`/MovieDetails/${movie.id}`} className="movie-card">
@@ -36,13 +38,9 @@ function MovieCard({ movie }) {
                     <h3>{movie.title}</h3>
                     <p>{movie.release_date.slice(0, 4)}</p>
                 </div>
-
             </Link>
-
         </div>
-    )
+    );
 }
 
 export default MovieCard;
-
-

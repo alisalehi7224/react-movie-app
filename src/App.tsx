@@ -1,9 +1,9 @@
-import Home from './pages/Home.jsx'
-import MovieDetails from './pages/MovieDetails.jsx'
-import Favorite from './pages/Favorites.jsx'
-import NavBar from './components/NavBar.jsx'
+import Home from './pages/Home'
+import MovieDetails from './pages/MovieDetails'
+import Favorite from './pages/Favorites'
+import NavBar from './components/NavBar'
 import { Route, Routes } from 'react-router-dom';
-import { MovieProvider } from './contexts/MovieContext.jsx';
+import { MovieProvider } from './contexts/MovieContext';
 import './css/App.css'
 
 function App() {

@@ -1,26 +1,26 @@
-import { useMovieContext } from '../contexts/MovieContext.jsx';
+import { useMovieContext, Movie } from '../contexts/MovieContext';
 import "../css/MovieDetails.css"
-import { getMovieDetails } from '../services/api.js'
+import { getMovieDetails } from '../services/api'
 import { useParams } from 'react-router-dom';
-import {useState, useEffect} from 'react'
+import {useState, useEffect, MouseEvent} from 'react'
 
 
 function MovieDetails() {
-    const [error, setError] = useState(null);
-
-    const {ID} = useParams()
-    const [movie, setMovie] = useState(null);
+    const [error, setError] = useState<string | null>(null);
+    const [movie, setMovie] = useState<Movie | null>(null);
+    const {ID} = useParams<{ ID: string }>()
     
     useEffect(() => {
         const controller = new AbortController();
 
         async function loadMovie() {
             try{
+                if (!ID) return;
                 setError(null);
-                const data = await getMovieDetails(ID, controller.signal);
+                const data = await getMovieDetails(+ID, controller.signal);
                 setMovie(data);
             }catch(err){
-                if(err.name === "AbortError") return;
+                if(err instanceof Error && err.name === "AbortError") return;
                 console.error(err)
                 setError("Failed to load movie details...");
             }
@@ -35,16 +35,15 @@ function MovieDetails() {
     if (!movie) return <div className="error-message">Loading...</div>;
     
     const favorite = isFavorite(movie.id);
-    function onFavoriteClick(e) {
+
+    function onFavoriteClick(e: MouseEvent) {
         e.preventDefault();
+        if(!movie) return;
         if (!favorite) {
             addToFavorites(movie)
         }
         else { removeFromFavorites(movie.id) }
     }
-    
-
-
 
     const posterURL = `https://www.themoviedb.org/t/p/w500/${movie.poster_path}`;
     const backdropURL = `https://www.themoviedb.org/t/p/w780/${movie.backdrop_path}`;
@@ -68,14 +67,14 @@ function MovieDetails() {
                         </div>
 
                         <div className="details-genres">
-                            {movie.genres.map(g => <span className="genre-pill" key={g.id}>{g.name}</span>)}
+                            {movie.genres?.map(g => <span className="genre-pill" key={g.id}>{g.name}</span>)}
                         </div>
 
                         <div className="details-stats">
                             <div className="stat-card"><span className="stat-label">Rating ⭐</span><span className="stat-value">{movie.vote_average.toFixed(1)} / 10</span></div>
-                            <div className="stat-card"><span className="stat-label">Runtime</span><span className="stat-value">{`${Math.floor(movie.runtime/60)}H ${movie.runtime%60}M`}</span></div>
+                            <div className="stat-card"><span className="stat-label">Runtime</span><span className="stat-value">{`${Math.floor((movie.runtime || 0)/60)}H ${(movie.runtime || 0)%60}M`}</span></div>
                             <div className="stat-card"><span className="stat-label">Released</span><span className="stat-value">{movie.release_date.slice(0, 4)}</span></div>
-                            <div className="stat-card"><span className="stat-label">Language</span><span className="stat-value">{movie.original_language.toUpperCase()}</span></div>
+                            <div className="stat-card"><span className="stat-label">Language</span><span className="stat-value">{movie.original_language?.toUpperCase()}</span></div>
                         </div>
 
                         <p className="details-overview">{movie.overview}</p>
