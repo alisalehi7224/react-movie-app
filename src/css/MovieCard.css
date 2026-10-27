@@ -11,6 +11,23 @@
 .movie-card{
   border-radius: 13px;
   overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.movie-card * {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.movie-card:focus,
+.movie-card:active {
+  outline: none;
+  box-shadow: none;
 }
 
 .movie-card:hover {
@@ -32,27 +49,23 @@
   object-fit: cover;
 }
 
+/* ==========================================================================
+   Movie Overlay & Favorite Button Styles
+   ========================================================================== */
+
 .movie-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0.8)
-  );
-  opacity: 0;
-  transition: opacity 0.2s;
+  background: transparent;
+  opacity: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 1rem;
-}
-
-.movie-card-wrapper:hover .movie-overlay {
-  opacity: 1;
+  pointer-events: none;
 }
 
 .favorite-btn {
@@ -69,7 +82,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .favorite-btn:hover {
@@ -80,6 +97,36 @@
 .favorite-btn.active {
   color: #ff4757;
 }
+
+@media (hover: hover) and (pointer: fine) {
+  .movie-overlay{
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.8)
+    );
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .favorite-btn{
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .movie-card-wrapper:hover .movie-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .movie-card-wrapper:hover .favorite-btn,
+  .favorite-btn:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+
 
 /*rating not added yet*/
 .rating-select {
