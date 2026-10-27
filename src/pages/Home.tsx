@@ -8,6 +8,8 @@ import { useDebounce } from "../hooks/useDebounce";
 
 function Home() {
     const inputRef = useRef<HTMLInputElement>(null)
+    const searchContainerRef = useRef<HTMLDivElement>(null);
+
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -16,7 +18,7 @@ function Home() {
     const [suggestions, setSuggestions] = useState<Movie[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
 
-    const debouncedQuery = useDebounce(searchQuery, 400);
+    const debouncedQuery = useDebounce(searchQuery, 200);
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -61,6 +63,30 @@ function Home() {
         return () => controller.abort();
     }, [debouncedQuery])
 
+    useEffect(() => {
+        if (!showSuggestions) return;
+
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            const target = event.target as Node | null;
+
+            if (
+                searchContainerRef.current &&
+                target &&
+                !searchContainerRef.current.contains(target)
+            ) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("touchstart", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
+        };
+    }, [showSuggestions]);
+
+
     const handleSearch = async (e: SubmitEvent) => {
         e.preventDefault();
 
@@ -88,7 +114,7 @@ function Home() {
         <>
             <div className="home">
                 <form onSubmit={handleSearch} className="search-form">
-                    <div className="search-input-wrapper">
+                    <div ref={searchContainerRef} className="search-input-wrapper">
                         <input
                             value={searchQuery}
                             ref={inputRef}
