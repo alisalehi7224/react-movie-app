@@ -1,4 +1,4 @@
-import { MouseEvent } from "react";
+import { MouseEvent, memo } from "react";
 import "../css/MovieCard.css";
 import { useMovieContext, Movie } from '../contexts/MovieContext';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,6 @@ function MovieCard({ movie }: { movie: Movie }) {
     const { addToFavorites, isFavorite, removeFromFavorites } = useMovieContext();
 
     const favorite = isFavorite(movie.id);
-    
     function onFavoriteClick(e: MouseEvent<HTMLButtonElement>) {
         e.stopPropagation();
         e.preventDefault();
@@ -43,4 +42,4 @@ function MovieCard({ movie }: { movie: Movie }) {
     );
 }
 
-export default MovieCard;
+export default memo(MovieCard);
