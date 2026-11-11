@@ -16,11 +16,14 @@ app.get("/", (req, res) => {
 
 app.get("/api/movies/popular", async (req, res) => {
   try {
+    const page = req.query.page || 1;
+
     const response = await axios.get(
       "https://api.themoviedb.org/3/movie/popular",
       {
         params: {
           api_key: process.env.TMDB_API_KEY,
+          page: page,
         },
       }
     );
@@ -37,12 +40,19 @@ app.get("/api/movies/popular", async (req, res) => {
 
 app.get("/api/movies/search", async (req, res) => {
   try {
+    const { query, page = 1} = req.query;
+
+    if(!query){
+      return res.status(400).json({error: "Query parameter is required"})
+    }
+
     const response = await axios.get(
       "https://api.themoviedb.org/3/search/movie",
       {
         params: {
           api_key: process.env.TMDB_API_KEY,
-          query: req.query.query,
+          query: query,
+          page: page,
         },
       }
     );
