@@ -44,7 +44,6 @@ function Home() {
                     : await getPopularMovies(currentPage, controller.signal);
 
                 setMovies(data.results);
-                console.log(data);
                 // TMDB hard limit: never allow pagination past page 500
                 setTotalPages(Math.min(data.total_pages, 500));
             }catch(err){
@@ -52,7 +51,9 @@ function Home() {
                 console.error(err);
                 setError("Failed to load movies...");
             } finally {
+               if (!controller.signal.aborted) {
                 setLoading(false);
+               }
             }
         };
 
@@ -125,7 +126,6 @@ function Home() {
         if (currentPage < totalPages && !loading) {
             setCurrentPage(prev => prev + 1);
             window.scrollTo({top: 0, behavior: "smooth"});
-            console.log(currentPage);
         }
     };
 
