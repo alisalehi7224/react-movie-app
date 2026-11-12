@@ -20,7 +20,7 @@ function Home() {
     const [activeQuery, setActiveQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    
+
     const [loading, setLoading] = useState(true);
     const [movies, setMovies] = useState<Movie[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -37,29 +37,29 @@ function Home() {
             setLoading(true);
             setError(null);
 
-            try{
+            try {
                 // If there's an active query, fetch search results. Otherwise, fetch popular movies.
-                const data = activeQuery.trim() 
+                const data = activeQuery.trim()
                     ? await searchMovies(activeQuery, currentPage, controller.signal)
                     : await getPopularMovies(currentPage, controller.signal);
 
                 setMovies(data.results);
                 // TMDB hard limit: never allow pagination past page 500
                 setTotalPages(Math.min(data.total_pages, 500));
-            }catch(err){
+            } catch (err) {
                 if (err instanceof Error && err.name === "AbortError") return;
                 console.error(err);
                 setError("Failed to load movies...");
             } finally {
-               if (!controller.signal.aborted) {
-                setLoading(false);
-               }
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchMainGrid();
         return () => controller.abort();
-}, [activeQuery, currentPage]);
+    }, [activeQuery, currentPage]);
 
     // Suggestions Effect
     useEffect(() => {
@@ -112,7 +112,7 @@ function Home() {
     // Lightweight event handlers
     const handleSearch = (e: SubmitEvent) => {
         e.preventDefault();
-        if(!searchQuery.trim() || loading) return;
+        if (!searchQuery.trim() || loading) return;
 
         setActiveQuery(searchQuery);
         setCurrentPage(1);
@@ -122,18 +122,11 @@ function Home() {
         setSuggestions([]);
     };
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages && !loading) {
-            setCurrentPage(prev => prev + 1);
-            window.scrollTo({top: 0, behavior: "smooth"});
-        }
-    };
-
-    const handlePrevPage = () => {
-        if(currentPage > 1 && !loading) {
-            setCurrentPage(prev => prev - 1);
-            window.scrollTo({top: 0, behavior: "smooth"});
-        }
+    // Unified pagination handler
+    const handlePageChange = (newPage: number) => {
+        if (loading || newPage < 1 || newPage > totalPages || newPage === currentPage) return;
+        setCurrentPage(newPage);
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     return (
@@ -160,7 +153,7 @@ function Home() {
                                         to={`/MovieDetails/${movie.id}`}
                                         className="suggestion-link"
                                         onClick={() => setShowSuggestions(false)}>
-                                        
+
                                         <span className="suggestion-title">{movie.title}</span>
                                         {movie.release_date && (
                                             <span className="suggestion-year">
@@ -177,14 +170,14 @@ function Home() {
                     Search
                 </button>
             </form>
-            
+
             {/* Clear search button */}
             {activeQuery && !loading && (
-                <div style={{ textAlign: 'center', marginBottom: '2rem'}}>
-                    <h2 style={{ marginBottom: '1rem'}}>Search Results for "{activeQuery}"</h2>
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <h2 style={{ marginBottom: '1rem' }}>Search Results for "{activeQuery}"</h2>
                     <button
                         className="search-button"
-                        onClick={() => {setActiveQuery(""); setCurrentPage(1);}}
+                        onClick={() => { setActiveQuery(""); setCurrentPage(1); }}
                     >
                         Clear Search
                     </button>
@@ -192,31 +185,36 @@ function Home() {
             )}
 
 
-
             {error &&
                 <div className="error-message">
                     {error}
                 </div>}
 
-            {loading ?
-                <div className="loading">
-                    Loading...
+
+            {loading && movies.length === 0 ? (
+                <div className="loading">Loading...</div>
+            ) : movies.length === 0 ? (
+                <div className="no-results">No results were found.</div>
+            ) : (
+                <div
+                    className={`${movies.length > 2
+                            ? "movies-grid"
+                            : movies.length > 1
+                            ? "movies-grid-2"
+                            : "movies-grid-1"
+                        } ${loading ? "grid-loading" : ""}`}
+                >
+                    {movies.map(movie =>
+                        <MovieCard movie={movie} key={movie.id} />)}
                 </div>
-                :
-                movies.length === 0 ?
-                    <div className="no-results">No results were found.</div>
-                    :
-                    <div className={movies.length > 2 ? "movies-grid" : movies.length > 1 ? "movies-grid-2" : "movies-grid-1"}>
-                        {movies.map(movie =>
-                            <MovieCard movie={movie} key={movie.id} />)}
-                    </div>}
+            )}
 
             {/* Pagination controls */}
             {!loading && movies.length > 0 && totalPages > 1 && (
                 <div className="pagination">
                     <button
-                        onClick={handlePrevPage}
-                        disabled={currentPage <= 1}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage <= 1 || loading}
                         className="pagination-btn"
                     >
                         &larr; Prev
@@ -225,8 +223,8 @@ function Home() {
                         Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                     </span>
                     <button
-                        onClick={handleNextPage}
-                        disabled={currentPage >= totalPages}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage >= totalPages || loading}
                         className="pagination-btn"
                     >
                         Next &rarr;
